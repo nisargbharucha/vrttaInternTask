@@ -1,0 +1,7 @@
+app==0.0.1
+deptry==0.23.1
+Flask==3.1.2
+packaging==25.0
+python-dotenv==1.2.1
+requirements-parser==0.13.0
+tomli==2.3.0
