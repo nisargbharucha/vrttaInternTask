@@ -1,23 +1,47 @@
-from flask import Flask
-from dotenv import load_dotenv
 import os
+from flask import Flask
+from . import database  # Import the database module from the app folder
 
-from app.database import *
-from .routers import routes  # Change from .routers.routes import routes
+def create_app(test_config=None):
+    # Create and configure the app
+    app = Flask(__name__, instance_relative_config=True)
+    
+    # Set default config
+    app.config.from_mapping(
+        DATABASE=os.path.join(app.instance_path, "vrtta.db"),
+    )
 
-def create_app():
-    load_dotenv()
+    if test_config is None:
+        # Load the instance config, if it exists, when not testing
+        app.config.from_pyfile("config.py", silent=True)
+    else:
+        # Load the test config if passed in
+        app.config.from_mapping(test_config)
 
-    app = Flask(__name__)
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+    # Ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
 
-    app.register_blueprint(routes)
+    # --- Initialize Database ---
+    # Register the close_db and init_db functions with the app
+    app.teardown_appcontext(database.close_db)
+    with app.app_context():
+        database.init_db()
 
-    @app.before_request
-    def before_request():
-        init_db()
+    # --- Register Blueprints ---
+    # Import your routes from the 'api' sub-directory
+    from .routers import routes as api_blueprint
+    
+    # Register the blueprint with the app
+    # This is the line that fixes your error
+    app.register_blueprint(api_blueprint)
 
-    @app.teardown_appcontext
-    def teardown(exception):
-        close_db()
+
+    # A simple test route
+    @app.route('/hello')
+    def hello():
+        return 'Hello, World!'
+
     return app

@@ -1,6 +1,9 @@
 WEIGHTS = {"gwp": 0.4, "circularity": 0.4, "cost": 0.2}
 
-def calculate_score(data):
+def calculate_score(data, custom_weights=None):
+    # Use custom weights if provided, otherwise use default 
+    weights = custom_weights if custom_weights else WEIGHTS
+    
     gwp = float(data["gwp"])
     cost = float(data["cost"])
     circularity = float(data["circularity"])
@@ -8,10 +11,14 @@ def calculate_score(data):
     gwp_score = max(0, 100 - gwp * 10)
     cost_score = max(0, 100 - cost * 5)
 
+    # Basic validation that weights structure is correct
+    if not all(k in weights for k in ["gwp", "circularity", "cost"]):
+        weights = WEIGHTS # Fallback to default
+
     score = (
-        WEIGHTS["gwp"] * gwp_score +
-        WEIGHTS["circularity"] * circularity +
-        WEIGHTS["cost"] * cost_score
+        weights["gwp"] * gwp_score +
+        weights["circularity"] * circularity +
+        weights["cost"] * cost_score
     )
 
     if score >= 85: rating = "A"

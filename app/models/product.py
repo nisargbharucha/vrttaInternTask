@@ -22,3 +22,7 @@ def fetch_rating_counts(db):
         FROM products
         GROUP BY rating
     """).fetchall()
+
+
+def fetch_all_suggestions(db):
+    return db.execute("SELECT suggestions FROM products WHERE suggestions IS NOT NULL AND suggestions != ''").fetchall()
