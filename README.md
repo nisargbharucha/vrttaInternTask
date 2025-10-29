@@ -149,3 +149,5 @@ Returns aggregated statistics across all submitted products for the main dashboa
     ]
 }
 ```
+
+To activate the frontend, please navigate to the `frontend` folder and view its README for further instructions.

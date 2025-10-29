@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 from . import database  # Import the database module from the app folder
 
 def create_app(test_config=None):
@@ -24,6 +25,9 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # --- Configure CORS ---
+    CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:3000'], supports_credentials=True)
+    
     # --- Initialize Database ---
     # Register the close_db and init_db functions with the app
     app.teardown_appcontext(database.close_db)
